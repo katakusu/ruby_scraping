@@ -3,7 +3,13 @@ require 'open-uri'
 # Nokogiriライブラリの読み込み
 require 'nokogiri'
 
+require 'kconv'
 # 関数宣言
+
+### リンク中の画像をダウンロードする ###
+def imagePage(pagelink)
+  puts pagelink
+end
 
 ### 各ページへのリンクを渡す ###
 def scrapePage(pagelink)
@@ -16,9 +22,27 @@ def scrapePage(pagelink)
 
   doc = Nokogiri::HTML.parse(html, nil, charset)
 
-  doc.xpath('//div[@class="mdMTMWidget01Content01 MdCF"]/div[@class="mdMTMWidget01ItemTtl01"]'+
-    '/p[@class="mdMTMWidget01ItemTtl01View"]').each do |subtitle|
-      puts subtitle.text
+  doc.xpath('//div[@class="MdMTMWidgetList01"]'+
+    '/div[@class="MdMTMWidget01 mdMTMWidget01TypeImg"]'+
+    '/div[@class="mdMTMWidget01Content01 MdCF"]').each do |subtitle|
+
+      #puts subtitle
+      #puts '======'
+
+      # 画像部分抽出
+      subtitle.xpath('./div[@class="mdMTMWidget01Content01Thumb"]'+
+        '//a/@href').each do |imagePageUrl|
+          imagePage(imagePageUrl)
+      end
+
+      # テキスト部分抽出
+      subtitle.xpath('./div[@class="mdMTMWidget01Content01Txt"]').each do |txtPage|
+        /\s+(\S+)\s+(\S+)/ =~ txtPage.text.toutf8
+        puts $1
+        puts $2
+        #puts txtPage.text.toutf8
+      end
+      #puts subtitle.text
   end
 end
 
