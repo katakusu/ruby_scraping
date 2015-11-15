@@ -6,7 +6,16 @@ require 'nokogiri'
 require 'kconv'
 # 関数宣言
 
-### リンク中の画像をダウンロードする ###
+def downloadImage(url, filename)
+=begin
+  open(filename, 'wb') do |output|
+    open(url) do |data|
+      output.write(data.read)
+    end
+  end
+=end
+end
+
 def getMaxPage(doc)
   maxpage = 1
   doc.xpath('//div[@class="MdPagination04"]/a').each do |pagenumber|
@@ -40,6 +49,7 @@ def imagePage(imagelink)
   doc.xpath('//div[@class="mdMTMEnd01Item01"]'+
     '/p[@class="mdMTMEnd01Img01"]/a/@href').each do |imgpath|
       puts ' ->'+imgpath.text
+      return imgpath.text
   end
 end
 
@@ -53,23 +63,27 @@ def scrapePage(pagelink)
   end
 
   doc = Nokogiri::HTML.parse(html, nil, charset)
-
   doc.xpath('//div[@class="MdMTMWidgetList01"]'+
     '/div[@class="MdMTMWidget01 mdMTMWidget01TypeImg"]'+
     '/div[@class="mdMTMWidget01Content01 MdCF"]').each do |subtitle|
+
       # 画像部分抽出
       subtitle.xpath('./div[@class="mdMTMWidget01Content01Thumb"]'+
         '//a/@href').each do |imagePageUrl|
-          imagePage(imagePageUrl)
+          $imagePath = imagePage(imagePageUrl)
       end
 
-      # テキスト部分抽出
+      # テキスト+部分抽$出
       subtitle.xpath('./div[@class="mdMTMWidget01Content01Txt"]').each do |txtPage|
         /\s+(\S+)\s+(\S+)/ =~ txtPage.text.toutf8
         puts ' >'+$1
+          $imageName = $1
         puts ' >'+$2
+          $imageDesc = $2
         puts ''
       end
+
+      downloadImage($imagePath, $folderPath+$imageName+'_'+$imageDesc)
   end
 end
 
@@ -119,7 +133,8 @@ end
 ###============ アクションポイント ==================###
 
 dateTime = DateTime.now.strftime('%Y%m%d-%H%M%S')
-Dir.mkdir('./data_'+dateTime.to_s+'/')
+$folderPath = './data_'+dateTime.to_s+'/'
+Dir.mkdir($folderPath)
 
 userPage('http://matome.naver.jp/mymatome/a-r?page=1&order=U&type=C')
 userPage('http://matome.naver.jp/mymatome/a-r?page=2&order=U&type=C')
