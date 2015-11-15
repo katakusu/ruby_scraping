@@ -2,18 +2,20 @@
 require 'open-uri'
 # Nokogiriライブラリの読み込み
 require 'nokogiri'
-
+require 'logger'
 require 'kconv'
 # 関数宣言
 
 def downloadImage(url, filename)
-=begin
+  /(\.[a-zA-Z]+)$/ =~ url
+  filename = filename+$1
+  filename.gsub!('?', '')
+  $log.debug("saved : #{filename}")
   open(filename, 'wb') do |output|
     open(url) do |data|
       output.write(data.read)
     end
   end
-=end
 end
 
 def getMaxPage(doc)
@@ -29,8 +31,10 @@ end
 def getScrapeMaxPage(doc)
   maxpage = 1
   doc.xpath('//div[@class="MdPagination03"]').each do |pagenumber|
-    if pagenumber.text.scan(/[0-9]+/).size > maxpage
-      maxpage = pagenumber.text.scan(/[0-9]+/).size
+    scanMaxpage = pagenumber.text.scan(/[0-9]+/).size
+    if scanMaxpage > maxpage
+      $log.debug("現在の最大ページ:#{maxpage},,,スキャン:#{scanMaxpage}")
+      maxpage = scanMaxpage
     end
   end
   return maxpage
@@ -109,6 +113,7 @@ end
 
 ### ユーザーページ1,2,3,///処理 ###
 def userPage(url)
+  $log.debug("userPage method start : #{url}")
   charset = nil
   html = open(url) do |f|
     charset = f.charset # 文字種別を取得
@@ -135,6 +140,8 @@ end
 dateTime = DateTime.now.strftime('%Y%m%d-%H%M%S')
 $folderPath = './data_'+dateTime.to_s+'/'
 Dir.mkdir($folderPath)
+
+$log = Logger.new("#{$folderPath}logging.log")
 
 userPage('http://matome.naver.jp/mymatome/a-r?page=1&order=U&type=C')
 userPage('http://matome.naver.jp/mymatome/a-r?page=2&order=U&type=C')
