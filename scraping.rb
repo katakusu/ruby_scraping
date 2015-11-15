@@ -74,7 +74,7 @@ def scrapePage(pagelink)
 end
 
 def countScrapePage(url)
-  if 'http://matome.naver.jp/odai/2140161890279207501' != url
+  if 'http://matome.naver.jp/odai/2140161890279207501' != url && 'http://matome.naver.jp/odai/2140150767408311301' != url
     scrapePage(url)
 
     charset = nil
@@ -125,8 +125,8 @@ for i in 1..3 do
 end
 =end
 userPage('http://matome.naver.jp/mymatome/a-r?page=1&order=U&type=C')
-
-
+userPage('http://matome.naver.jp/mymatome/a-r?page=2&order=U&type=C')
+userPage('http://matome.naver.jp/mymatome/a-r?page=3&order=U&type=C')
 
 
 
