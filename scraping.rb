@@ -8,12 +8,21 @@ require 'kconv'
 
 ### リンク中の画像をダウンロードする ###
 def imagePage(pagelink)
-  puts pagelink
+  puts ' >'+pagelink
+  charset = nil
+  html = open(pagelink) do |f|
+    charset = f.charset
+    f.read
+  end
+
 end
 
 ### 各ページへのリンクを渡す ###
 def scrapePage(pagelink)
-  puts pagelink
+  if 'http://matome.naver.jp/odai/2140161890279207501' == pagelink
+    return
+  end
+  puts '>'+pagelink
   charset = nil
   html = open(pagelink) do |f|
     charset = f.charset # 文字種別を取得
@@ -38,8 +47,8 @@ def scrapePage(pagelink)
       # テキスト部分抽出
       subtitle.xpath('./div[@class="mdMTMWidget01Content01Txt"]').each do |txtPage|
         /\s+(\S+)\s+(\S+)/ =~ txtPage.text.toutf8
-        puts $1
-        puts $2
+        puts ' >'+$1
+        puts ' >'+$2
         #puts txtPage.text.toutf8
       end
       #puts subtitle.text
