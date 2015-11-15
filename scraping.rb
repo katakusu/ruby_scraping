@@ -116,14 +116,11 @@ def userPage(url)
   end
 end
 
+###============ アクションポイント ==================###
 
+dateTime = DateTime.now.strftime('%Y%m%d-%H%M%S')
+Dir.mkdir('./data_'+dateTime.to_s+'/')
 
-# スクレイピング先のURL
-=begin
-for i in 1..3 do
-  puts i
-end
-=end
 userPage('http://matome.naver.jp/mymatome/a-r?page=1&order=U&type=C')
 userPage('http://matome.naver.jp/mymatome/a-r?page=2&order=U&type=C')
 userPage('http://matome.naver.jp/mymatome/a-r?page=3&order=U&type=C')
